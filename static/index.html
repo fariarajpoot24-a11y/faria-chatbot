@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aria | Faria Rajpoot's Portfolio Assistant</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="avatar">A</div>
+        <div>
+          <h1>Aria</h1>
+          <p><span class="dot"></span> Faria Rajpoot's portfolio assistant</p>
+        </div>
+      </div>
+      <div class="actions">
+        <a class="btn ghost" href="https://fariarajpoot0-portfolio.netlify.app" target="_blank" rel="noopener">Portfolio</a>
+        <button id="clearBtn" class="icon-btn" title="New chat" aria-label="New chat">↺</button>
+        <button id="themeBtn" class="icon-btn" title="Toggle theme" aria-label="Toggle theme">◐</button>
+      </div>
+    </header>
+
+    <section id="messages" class="messages" aria-live="polite"></section>
+
+    <div id="chips" class="chips">
+      <button>Tell me about Faria</button>
+      <button>What are her skills?</button>
+      <button>Show her projects</button>
+      <button>Work experience?</button>
+      <button>How can I contact her?</button>
+    </div>
+
+    <form id="form" class="composer" autocomplete="off">
+      <input id="input" type="text" placeholder="Ask me anything about Faria…" maxlength="500" required />
+      <button type="submit" id="send" aria-label="Send">➤</button>
+    </form>
+    <p class="foot">Aria is an AI and may make mistakes. Answers are based on Faria's portfolio.</p>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
