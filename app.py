@@ -28,17 +28,19 @@ def info():
 @app.post("/api/chat")
 def chat():
     if not API_KEY:
-        return jsonify(error="Server is missing OPENROUTER_API_KEY. Check your .env file."), 500
+        return jsonify(error="Server is missing OPENROUTER_API_KEY."), 500
 
     data = request.get_json(silent=True) or {}
     history = data.get("messages", [])
 
-    # Keep only valid roles, trim length, and limit history to the last 12 turns.
     clean = [
         {"role": m["role"], "content": str(m["content"])[:2000]}
         for m in history
-        if isinstance(m, dict) and m.get("role") in ("user", "assistant") and m.get("content")
+        if isinstance(m, dict)
+        and m.get("role") in ("user", "assistant")
+        and m.get("content")
     ][-12:]
+
     if not clean or clean[-1]["role"] != "user":
         return jsonify(error="No user message received."), 400
 
@@ -48,27 +50,37 @@ def chat():
         "temperature": 0.5,
         "max_tokens": 500,
     }
+
     headers = {
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://fariarajpoot0-portfolio.netlify.app",
+        "HTTP-Referer": os.getenv(
+            "SITE_URL", "https://fariarajpoot0-portfolio.netlify.app"
+        ),
         "X-Title": f"{ASSISTANT_NAME} - Faria Rajpoot Portfolio",
     }
 
     try:
-        r = requests.post(OPENROUTER_URL, json=payload, headers=headers, timeout=60)
-        r.raise_for_status()
-        reply = r.json()["choices"][0]["message"]["content"].strip()
+        response = requests.post(
+            OPENROUTER_URL, json=payload, headers=headers, timeout=60
+        )
+        response.raise_for_status()
+        reply = response.json()["choices"][0]["message"]["content"].strip()
         return jsonify(reply=reply)
+
     except requests.HTTPError:
         try:
-            msg = r.json().get("error", {}).get("message", "OpenRouter request failed.")
+            message = response.json().get("error", {}).get(
+                "message", "OpenRouter request failed."
+            )
         except Exception:
-            msg = "OpenRouter request failed."
-        return jsonify(error=msg), 502
+            message = "OpenRouter request failed."
+        return jsonify(error=message), 502
+
     except (requests.RequestException, KeyError, IndexError, ValueError):
         return jsonify(error="Couldn't reach the AI service. Please try again."), 502
 
 
 if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=5000, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
